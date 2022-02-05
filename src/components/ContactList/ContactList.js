@@ -1,6 +1,9 @@
-import { useMemo } from "react";
+import { createSelector } from "@reduxjs/toolkit";
 import ContactItem from "../ContactItem/ContactItem";
-import { getFilter } from "../../redux/Contacts/contacts-selectors";
+import {
+  getContacts,
+  getFilter,
+} from "../../redux/Contacts/contacts-selectors";
 import { useSelector } from "react-redux";
 import {
   useFetchContactsQuery,
@@ -8,16 +11,20 @@ import {
 } from "../../redux/Contacts/contacts-slice";
 
 function ContactList() {
-  const { data, error, isFetching } = useFetchContactsQuery();
-  const filter = useSelector(getFilter);
+  const { error, isFetching } = useFetchContactsQuery();
   const [deleteContact] = useDeleteContactMutation();
 
-  const filteredArray = useMemo(() => {
-    const normalizedFilter = filter.toLowerCase();
-    return data?.filter((contact) =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
-  }, [data, filter]);
+  const getFilteredArray = createSelector(
+    [getContacts, getFilter],
+    (contacts, filter) => {
+      if (!contacts || contacts.length === 0) return [];
+      const normalizedFilter = filter.toLowerCase();
+      return contacts.filter((contact) =>
+        contact.name.toLowerCase().includes(normalizedFilter)
+      );
+    }
+  );
+  const filteredArray = useSelector(getFilteredArray);
 
   return (
     <>

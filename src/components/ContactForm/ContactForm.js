@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Container, Field } from "./ContactForm.styled";
-import {
-  useCreateContactMutation,
-  useFetchContactsQuery,
-} from "../../redux/Contacts/contacts-slice";
+import { useCreateContactMutation } from "../../redux/Contacts/contacts-slice";
+import { useSelector } from "react-redux";
+import { getContacts } from "../../redux/Contacts/contacts-selectors";
 
 function ContactForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const { data } = useFetchContactsQuery();
+  const contacts = useSelector(getContacts);
   const [createContact] = useCreateContactMutation();
 
   const handleChange = (value, name) => {
@@ -33,7 +32,7 @@ function ContactForm() {
   };
 
   const onAddContact = () => {
-    const filteredArray = findDuplicateContact(data, name);
+    const filteredArray = findDuplicateContact(contacts, name);
     if (filteredArray) {
       alert(`${name} is already in contacts.`);
       return;
